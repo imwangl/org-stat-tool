@@ -219,6 +219,12 @@ def process_org_stat(data_dir, output_dir, user_time):
     final_verify_path = f"{output_dir}/与财务核对版（{user_time}）.xlsx"
     shutil.copy(template2_path, final_verify_path)
     
+    # 修改与财务核对版A1
+    wb2 = openpyxl.load_workbook(final_verify_path)
+    ws2 = wb2.active
+    ws2.cell(1, 1).value = f"客户数据汇总表（{user_time}）与财务核对版"
+    wb2.save(final_verify_path)
+    
     # 读取源数据
     source_wb = openpyxl.load_workbook(final_output)
     source_ws = source_wb.active
