@@ -43,6 +43,12 @@ def process_org_stat(data_dir, output_dir, user_time):
     template_path = f"{output_dir}/模板.xlsx"
     shutil.copy(template_file, template_path)
     
+    # 修改A1单元格标题，添加时间
+    wb = openpyxl.load_workbook(template_path)
+    ws = wb.active
+    ws.cell(1, 1).value = f"客户数据汇总表（{user_time}）未与财务核对版"
+    wb.save(template_path)
+    
     # 步骤1-2: 财务表数据
     finance_data = []
     for f in [market_file, 
@@ -205,7 +211,7 @@ def process_org_stat(data_dir, output_dir, user_time):
     wb.save(template_path)
     
     # 保存主输出
-    final_output = f"{output_dir}/未与财务核对版本（{user_time}）.xlsx"
+    final_output = f"{output_dir}/未与财务核对版本.xlsx"
     shutil.copy(template_path, final_output)
     
     # 生成与财务核对版
