@@ -205,12 +205,12 @@ def process_org_stat(data_dir, output_dir, user_time):
     wb.save(template_path)
     
     # 保存主输出
-    final_output = f"{output_dir}/未与财务核对版本.xlsx"
+    final_output = f"{output_dir}/未与财务核对版本（{user_time}）.xlsx"
     shutil.copy(template_path, final_output)
     
     # 生成与财务核对版
     template2_path = template2_file
-    final_verify_path = f"{output_dir}/与财务核对版.xlsx"
+    final_verify_path = f"{output_dir}/与财务核对版（{user_time}）.xlsx"
     shutil.copy(template2_path, final_verify_path)
     
     # 读取源数据
