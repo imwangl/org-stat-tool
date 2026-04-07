@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>机构数统计工具</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .file-upload {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .file-upload:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        .file-list {
+            margin-top: 15px;
+            text-align: left;
+        }
+        .file-item {
+            background: #f5f5f5;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .file-item .remove {
+            color: red;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f0f0f0;
+            border-radius: 8px;
+        }
+        .result a {
+            display: block;
+            padding: 10px;
+            margin: 5px 0;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .result a:hover {
+            background: #f8f9ff;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            margin-top: 20px;
+        }
+        .tip {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏢 机构数统计工具</h1>
+        <div style="text-align:center;color:#888;font-size:12px;margin-bottom:20px">版本 1.0.4</div>
+        
+        <div class="form-group">
+            <label>📅 统计周期（如：3月、第1周）</label>
+            <input type="text" id="time" placeholder="请输入统计周期" value="3月">
+        </div>
+        
+        <div class="form-group">
+            <label>📁 上传数据文件（支持多选Excel文件）</label>
+            <input type="file" id="files" multiple accept=".xlsx,.xls" style="display:none" onchange="handleFiles(event)">
+            <div class="file-upload" onclick="document.getElementById('files').click()">
+                <div class="file-upload-text" id="fileName">
+                    点击选择Excel文件<br>
+                    <small>可多选</small>
+                </div>
+            </div>
+            <div class="file-list" id="fileList"></div>
+            <div class="tip">需要上传的文件：模板.xlsx、模版2.xlsx、3月企业用户数.xlsx、3月机构用户.xlsx、3月预充值.xlsx、3月历史客户.xlsx、客户数据汇总表-市场部26.4.xls、客户数据汇总表-战略增长中心26.4.xls</div>
+        </div>
+        
+        <button class="btn" id="submitBtn" onclick="submitForm()">
+            开始统计
+        </button>
+        
+        <div id="result"></div>
+    </div>
+    
+    <script>
+        let selectedFiles = [];
+        
+        function handleFiles(event) {
+            const files = event.target.files;
+            selectedFiles = Array.from(files);
+            
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            
+            if (selectedFiles.length > 0) {
+                document.getElementById('fileName').innerHTML = 
+                    `已选择 ${selectedFiles.length} 个文件<br><small>点击更换</small>`;
+                
+                selectedFiles.forEach((f, i) => {
+                    const div = document.createElement('div');
+                    div.className = 'file-item';
+                    div.innerHTML = `<span>${f.name}</span><span class="remove" onclick="removeFile(${i})">✕</span>`;
+                    fileList.appendChild(div);
+                });
+            } else {
+                document.getElementById('fileName').innerHTML = 
+                    '点击选择Excel文件<br><small>可多选</small>';
+            }
+        }
+        
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            handleFiles({target: {files: selectedFiles}});
+        }
+        
+        function submitForm() {
+            const time = document.getElementById('time').value;
+            const btn = document.getElementById('submitBtn');
+            const resultDiv = document.getElementById('result');
+            
+            if (selectedFiles.length === 0) {
+                alert('请先选择Excel文件');
+                return;
+            }
+            
+            if (!time) {
+                alert('请输入统计周期');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = '处理中...';
+            resultDiv.innerHTML = '<div class="loading">正在处理，请稍候...</div>';
+            
+            const formData = new FormData();
+            selectedFiles.forEach(f => {
+                formData.append('files', f);
+            });
+            formData.append('time', time);
+            
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.textContent = '开始统计';
+                
+                if (data.error) {
+                    resultDiv.innerHTML = '<div class="result" style="color: red;">错误: ' + data.error + '</div>';
+                } else if (data.success) {
+                    resultDiv.innerHTML = '<div class="result">' +
+                        '<h3>✅ 处理完成！</h3>' +
+                        '<a href="/download/' + encodeURIComponent(data.files[0].path.split('/').pop()) + '" target="_blank">📥 下载未与财务核对版本</a>' +
+                        '<a href="/download/' + encodeURIComponent(data.files[1].path.split('/').pop()) + '" target="_blank">📥 下载与财务核对版</a>' +
+                        '<a href="/download/' + encodeURIComponent(data.files[2].path.split('/').pop()) + '" target="_blank">📥 下载补贴比例统计</a>' +
+                        '</div>';
+                }
+            })
+            .catch(err => {
+                btn.disabled = false;
+                btn.textContent = '开始统计';
+                resultDiv.innerHTML = '<div class="result" style="color: red;">错误: ' + err + '</div>';
+            });
+        }
+    </script>
+</body>
+</html>
