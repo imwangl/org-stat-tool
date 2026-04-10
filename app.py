@@ -239,6 +239,7 @@ def process_org_stat(data_dir, output_dir, user_time):
     
     # 财务表P列匹配
     finance_p_data = {}
+    for f in (market_files + strategy_files):
         wb_f = xlrd.open_workbook(f)
         ws_f = wb_f.sheet_by_index(0)
         for row in range(3, ws_f.nrows):
