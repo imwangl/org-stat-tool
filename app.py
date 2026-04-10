@@ -301,6 +301,59 @@ def process_org_stat(data_dir, output_dir, user_time):
 def index():
     return render_template('index.html')
 
+
+@app.route('/upload_single', methods=['POST'])
+def upload_single():
+    """单文件上传处理 - 11个独立文件上传"""
+    user_time = request.form.get('time', '3月')
+    
+    # 创建任务目录
+    task_id = str(uuid.uuid4())
+    task_dir = os.path.join(app.config['UPLOAD_FOLDER'], task_id)
+    output_dir = os.path.join(app.config['OUTPUT_FOLDER'], task_id)
+    os.makedirs(task_dir, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # 文件名映射 (表单字段名 -> 期望的文件名)
+    # 注意：process_org_stat 用 find_file 模糊匹配，所以文件名包含关键词即可
+    file_map = {
+        'org_user': '机构用户.xlsx',        # 机构用户
+        'market': '客户数据市场部.xlsx',    # 客户数据汇总表-市场部
+        'strategy': '客户数据战略中心.xlsx', # 客户数据汇总表-战略增长中心
+        'history': '历史客户.xlsx',         # 历史客户
+        'template1': '模板.xlsx',          # 未与财务核对模板
+        'template2': '模版2.xlsx',         # 与财务核对模板
+        'company': '企业用户数.xlsx',       # 企业用户数
+        'all_history': '历史客户_全部.xlsx', # 全部历史客户
+        'prepaid': '预充值.xlsx',           # 预充值
+        'monthly': '月结用户.xlsx',         # 月结用户
+    }
+    
+    # 保存上传的文件
+    for key, filename in file_map.items():
+        f = request.files.get(key)
+        if f and f.filename:
+            save_name = filename
+            f.save(os.path.join(task_dir, save_name))
+            print(f"保存文件: {save_name}")
+    
+    # 处理
+    try:
+        final_output, final_verify = process_org_stat(task_dir, output_dir, user_time)
+        return jsonify({
+            'success': True,
+            'task_id': task_id,
+            'files': [
+                {'name': '未与财务核对版本.xlsx', 'path': final_output},
+                {'name': '与财务核对版.xlsx', 'path': final_verify},
+                {'name': '补贴比例统计.xlsx', 'path': f"{output_dir}/补贴比例统计.xlsx"}
+            ]
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/upload', methods=['POST'])
 def upload():
     if 'files' not in request.files:

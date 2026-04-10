@@ -54,35 +54,30 @@
             outline: none;
             border-color: #667eea;
         }
-        .file-upload {
-            border: 2px dashed #ccc;
-            border-radius: 8px;
-            padding: 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .file-upload:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
-        }
-        .file-list {
-            margin-top: 15px;
-            text-align: left;
-        }
-        .file-item {
-            background: #f5f5f5;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 6px;
+        .file-row {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            margin-bottom: 12px;
+            gap: 10px;
         }
-        .file-item .remove {
-            color: red;
-            cursor: pointer;
-            margin-left: 10px;
+        .file-row label {
+            flex: 0 0 140px;
+            margin-bottom: 0;
+        }
+        .file-row input[type="file"] {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        .file-status {
+            font-size: 12px;
+            color: #888;
+            margin-left: 150px;
+            margin-top: 4px;
+        }
+        .file-status.uploaded {
+            color: green;
         }
         .btn {
             width: 100%;
@@ -95,6 +90,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s;
+            margin-top: 20px;
         }
         .btn:hover {
             transform: translateY(-2px);
@@ -127,17 +123,12 @@
             color: #666;
             margin-top: 20px;
         }
-        .tip {
-            font-size: 12px;
-            color: #888;
-            margin-top: 5px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🏢 机构数统计工具</h1>
-        <div style="text-align:center;color:#888;font-size:12px;margin-bottom:20px">版本 1.0.4</div>
+        <div style="text-align:center;color:#888;font-size:12px;margin-bottom:20px">版本 2.0</div>
         
         <div class="form-group">
             <label>📅 统计周期（如：3月、第1周）</label>
@@ -145,16 +136,67 @@
         </div>
         
         <div class="form-group">
-            <label>📁 上传数据文件（支持多选Excel文件）</label>
-            <input type="file" id="files" multiple accept=".xlsx,.xls" style="display:none" onchange="handleFiles(event)">
-            <div class="file-upload" onclick="document.getElementById('files').click()">
-                <div class="file-upload-text" id="fileName">
-                    点击选择Excel文件<br>
-                    <small>可多选</small>
-                </div>
+            <label>📁 上传数据文件</label>
+            
+            <div class="file-row">
+                <label>机构用户：</label>
+                <input type="file" id="file_org_user" accept=".xlsx,.xls">
             </div>
-            <div class="file-list" id="fileList"></div>
-            <div class="tip">需要上传的文件：模板.xlsx、模版2.xlsx、3月企业用户数.xlsx、3月机构用户.xlsx、3月预充值.xlsx、3月历史客户.xlsx、客户数据汇总表-市场部26.4.xls、客户数据汇总表-战略增长中心26.4.xls</div>
+            <div class="file-status" id="status_org_user"></div>
+            
+            <div class="file-row">
+                <label>客户数据市场部：</label>
+                <input type="file" id="file_market" accept=".xlsx,.xls">
+            </div>
+            <div class="file-status" id="status_market"></div>
+            
+            <div class="file-row">
+                <label>客户数据战略中心：</label>
+                <input type="file" id="file_strategy" accept=".xlsx,.xls">
+            </div>
+            <div class="file-status" id="status_strategy"></div>
+            
+            <div class="file-row">
+                <label>历史客户：</label>
+                <input type="file" id="file_history" accept=".xlsx,.xls">
+            </div>
+            <div class="file-status" id="status_history"></div>
+            
+            <div class="file-row">
+                <label>未与财务核对模板：</label>
+                <input type="file" id="file_template1" accept=".xlsx,.xls">
+            </div>
+            <div class="file-status" id="status_template1"></div>
+            
+            <div class="file-row">
+                <label>与财务核对模板：</label>
+                <input type="file" id="file_template2" accept=".xlsx,.xls">
+            </div>
+            <div class="file-status" id="status_template2"></div>
+            
+            <div class="file-row">
+                <label>企业用户数：</label>
+                <input type="file" id="file_company" accept=".xlsx,.xls">
+            </div>
+            <div class="file-status" id="status_company"></div>
+            
+            <div class="file-row">
+                <label>全部历史客户：</label>
+                <input type="file" id="file_all_history" accept=".xlsx,.xls">
+            </div>
+            <div class="file-status" id="status_all_history"></div>
+            
+            <div class="file-row">
+                <label>预充值：</label>
+                <input type="file" id="file_prepaid" accept=".xlsx,.xls">
+            </div>
+            <div class="file-status" id="status_prepaid"></div>
+            
+            <div class="file-row">
+                <label>月结用户：</label>
+                <input type="file" id="file_monthly" accept=".xlsx,.xls">
+            </div>
+            <div class="file-status" id="status_monthly"></div>
         </div>
         
         <button class="btn" id="submitBtn" onclick="submitForm()">
@@ -165,45 +207,31 @@
     </div>
     
     <script>
-        let selectedFiles = [];
+        // 文件选择后显示状态
+        const fileIds = [
+            'file_org_user', 'file_market', 'file_strategy', 'file_history',
+            'file_template1', 'file_template2', 'file_company', 'file_all_history',
+            'file_prepaid', 'file_monthly'
+        ];
         
-        function handleFiles(event) {
-            const files = event.target.files;
-            selectedFiles = Array.from(files);
-            
-            const fileList = document.getElementById('fileList');
-            fileList.innerHTML = '';
-            
-            if (selectedFiles.length > 0) {
-                document.getElementById('fileName').innerHTML = 
-                    `已选择 ${selectedFiles.length} 个文件<br><small>点击更换</small>`;
-                
-                selectedFiles.forEach((f, i) => {
-                    const div = document.createElement('div');
-                    div.className = 'file-item';
-                    div.innerHTML = `<span>${f.name}</span><span class="remove" onclick="removeFile(${i})">✕</span>`;
-                    fileList.appendChild(div);
-                });
-            } else {
-                document.getElementById('fileName').innerHTML = 
-                    '点击选择Excel文件<br><small>可多选</small>';
-            }
-        }
-        
-        function removeFile(index) {
-            selectedFiles.splice(index, 1);
-            handleFiles({target: {files: selectedFiles}});
-        }
+        fileIds.forEach(id => {
+            document.getElementById(id).addEventListener('change', function() {
+                const statusId = 'status_' + id.replace('file_', '');
+                const statusEl = document.getElementById(statusId);
+                if (this.files.length > 0) {
+                    statusEl.textContent = '已选择: ' + this.files[0].name;
+                    statusEl.className = 'file-status uploaded';
+                } else {
+                    statusEl.textContent = '';
+                    statusEl.className = 'file-status';
+                }
+            });
+        });
         
         function submitForm() {
             const time = document.getElementById('time').value;
             const btn = document.getElementById('submitBtn');
             const resultDiv = document.getElementById('result');
-            
-            if (selectedFiles.length === 0) {
-                alert('请先选择Excel文件');
-                return;
-            }
             
             if (!time) {
                 alert('请输入统计周期');
@@ -215,12 +243,21 @@
             resultDiv.innerHTML = '<div class="loading">正在处理，请稍候...</div>';
             
             const formData = new FormData();
-            selectedFiles.forEach(f => {
-                formData.append('files', f);
-            });
             formData.append('time', time);
             
-            fetch('/upload', {
+            // 添加各个文件
+            formData.append('org_user', document.getElementById('file_org_user').files[0] || null);
+            formData.append('market', document.getElementById('file_market').files[0] || null);
+            formData.append('strategy', document.getElementById('file_strategy').files[0] || null);
+            formData.append('history', document.getElementById('file_history').files[0] || null);
+            formData.append('template1', document.getElementById('file_template1').files[0] || null);
+            formData.append('template2', document.getElementById('file_template2').files[0] || null);
+            formData.append('company', document.getElementById('file_company').files[0] || null);
+            formData.append('all_history', document.getElementById('file_all_history').files[0] || null);
+            formData.append('prepaid', document.getElementById('file_prepaid').files[0] || null);
+            formData.append('monthly', document.getElementById('file_monthly').files[0] || null);
+            
+            fetch('/upload_single', {
                 method: 'POST',
                 body: formData
             })
