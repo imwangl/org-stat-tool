@@ -329,7 +329,8 @@ def upload_single():
         'company': '企业用户数.xlsx',       # 企业用户数
         'all_history': '历史客户_全部.xlsx', # 全部历史客户
         'prepaid': '预充值.xlsx',           # 预充值
-        'monthly': '月结用户.xlsx',         # 月结用户
+        'monthly': '月结用户.xlsx',
+        'repayment': '回款数据-需去重.xlsx',         # 月结用户
     }
     
     # 保存上传的文件

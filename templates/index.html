@@ -197,6 +197,12 @@
                 <input type="file" id="file_monthly" accept=".xlsx,.xls">
             </div>
             <div class="file-status" id="status_monthly"></div>
+            
+            <div class="file-row">
+                <label>回款数据-需去重：</label>
+                <input type="file" id="file_repayment" accept=".xlsx,.xls">
+            </div>
+            <div class="file-status" id="status_repayment"></div>
         </div>
         
         <button class="btn" id="submitBtn" onclick="submitForm()">
@@ -255,7 +261,7 @@
             formData.append('company', document.getElementById('file_company').files[0] || null);
             formData.append('all_history', document.getElementById('file_all_history').files[0] || null);
             formData.append('prepaid', document.getElementById('file_prepaid').files[0] || null);
-            formData.append('monthly', document.getElementById('file_monthly').files[0] || null);
+            formData.append('monthly', 'repayment', document.getElementById('file_monthly').files[0] || null);
             
             fetch('/upload_single', {
                 method: 'POST',
