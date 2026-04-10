@@ -51,7 +51,7 @@ def process_org_stat(data_dir, output_dir, user_time):
     
     # 步骤1-2: 财务表数据
     finance_data = []
-    for f in (market_file + strategy_file):
+    for f in [market_file, strategy_file] if f:
         try:
             wb = xlrd.open_workbook(f)
             ws = wb.sheet_by_index(0)
@@ -239,7 +239,7 @@ def process_org_stat(data_dir, output_dir, user_time):
     
     # 财务表P列匹配
     finance_p_data = {}
-    for f in (market_file + strategy_file):
+    for f in [market_file, strategy_file] if f:
         wb_f = xlrd.open_workbook(f)
         ws_f = wb_f.sheet_by_index(0)
         for row in range(3, ws_f.nrows):
@@ -255,7 +255,7 @@ def process_org_stat(data_dir, output_dir, user_time):
     
     # 财务表R列匹配
     finance_r_data = {}
-    for f in (market_file + strategy_file):
+    for f in [market_file, strategy_file] if f:
         wb_f = xlrd.open_workbook(f)
         ws_f = wb_f.sheet_by_index(0)
         for row in range(3, ws_f.nrows):
