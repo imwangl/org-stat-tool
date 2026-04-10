@@ -51,7 +51,6 @@ def process_org_stat(data_dir, output_dir, user_time):
     
     # 步骤1-2: 财务表数据
     finance_data = []
-5c6dabd (修复：模糊匹配文件名，不再强制匹配日期)
         try:
             wb = xlrd.open_workbook(f)
             ws = wb.sheet_by_index(0)
@@ -89,7 +88,6 @@ def process_org_stat(data_dir, output_dir, user_time):
     
     # 步骤5: 企业用户数
     corp_data = {}
-5c6dabd (修复：模糊匹配文件名，不再强制匹配日期)
     ws = wb.active
     for row in range(3, ws.max_row + 1):
         name = ws.cell(row, 1).value
@@ -113,7 +111,6 @@ def process_org_stat(data_dir, output_dir, user_time):
     
     # 结果a
     result_a = f"{output_dir}/结果a.xlsx"
-5c6dabd (修复：模糊匹配文件名，不再强制匹配日期)
     wb = openpyxl.load_workbook(result_a)
     ws = wb.active
     ws.cell(1, 17).value = "认证企业"
@@ -122,12 +119,10 @@ def process_org_stat(data_dir, output_dir, user_time):
     for row in range(2, ws.max_row + 1):
         ws.cell(row, 17).value = ws.cell(row, 9).value
 
-5c6dabd (修复：模糊匹配文件名，不再强制匹配日期)
     ws_p = wb_p.active
     for i in range(2, min(ws_p.max_row + 1, ws.max_row + 1)):
         ws.cell(i, 18).value = ws_p.cell(i, 8).value
 
-5c6dabd (修复：模糊匹配文件名，不再强制匹配日期)
     ws_h = wb_h.active
     for i in range(2, min(ws_h.max_row + 1, ws.max_row + 1)):
         company = ws_h.cell(i, 5).value
@@ -198,7 +193,6 @@ def process_org_stat(data_dir, output_dir, user_time):
         ws.cell(row, 18).value = subsidy_50.get(name, 0)
         ws.cell(row, 19).value = subsidy_10.get(name, 0)
     
-5c6dabd (修复：模糊匹配文件名，不再强制匹配日期)
     ws_h = wb_h.active
     name_counts = {}
     for row in range(2, ws_h.max_row + 1):
@@ -244,7 +238,6 @@ def process_org_stat(data_dir, output_dir, user_time):
     
     # 财务表P列匹配
     finance_p_data = {}
-5c6dabd (修复：模糊匹配文件名，不再强制匹配日期)
         wb_f = xlrd.open_workbook(f)
         ws_f = wb_f.sheet_by_index(0)
         for row in range(3, ws_f.nrows):
@@ -260,7 +253,6 @@ def process_org_stat(data_dir, output_dir, user_time):
     
     # 财务表R列匹配
     finance_r_data = {}
-5c6dabd (修复：模糊匹配文件名，不再强制匹配日期)
         wb_f = xlrd.open_workbook(f)
         ws_f = wb_f.sheet_by_index(0)
         for row in range(3, ws_f.nrows):
