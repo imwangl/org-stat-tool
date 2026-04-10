@@ -51,6 +51,7 @@ def process_org_stat(data_dir, output_dir, user_time):
     
     # 步骤1-2: 财务表数据
     finance_data = []
+    for f in (market_files + strategy_files):
         try:
             wb = xlrd.open_workbook(f)
             ws = wb.sheet_by_index(0)
