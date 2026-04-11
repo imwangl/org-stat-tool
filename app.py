@@ -113,6 +113,11 @@ def process_org_stat(data_dir, output_dir, user_time):
     
     # 结果a
     result_a = f"{output_dir}/结果a.xlsx"
+    
+    # 加载预充值和历史客户文件
+    wb_p = openpyxl.load_workbook(precharge_file)
+    wb_h = openpyxl.load_workbook(history_file)
+    
     wb = openpyxl.load_workbook(result_a)
     ws = wb.active
     ws.cell(1, 17).value = "认证企业"
