@@ -261,7 +261,8 @@
             formData.append('company', document.getElementById('file_company').files[0] || null);
             formData.append('all_history', document.getElementById('file_all_history').files[0] || null);
             formData.append('prepaid', document.getElementById('file_prepaid').files[0] || null);
-            formData.append('monthly', 'repayment', document.getElementById('file_monthly').files[0] || null);
+            formData.append('monthly', document.getElementById('file_monthly').files[0] || null);
+            formData.append('repayment', document.getElementById('file_repayment').files[0] || null);
             
             fetch('/upload_single', {
                 method: 'POST',
