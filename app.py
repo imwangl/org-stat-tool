@@ -36,8 +36,8 @@ def process_org_stat(data_dir, output_dir, user_time):
     all_history_file = find_file(data_dir, "全部历史客户")
     monthly_file = find_file(data_dir, "月结用户")
     refund_file = find_file(data_dir, "回款数据")
-    market_file = find_file(data_dir, "客户数据汇总表-市场部")
-    strategy_file = find_file(data_dir, "客户数据汇总表-战略增长中心")
+    market_file = find_file(data_dir, "市场部")
+    strategy_file = find_file(data_dir, "战略")
     
     if not template_file:
         raise ValueError("错误: 未找到模板文件")
